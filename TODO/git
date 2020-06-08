@@ -1,0 +1,72 @@
+Workflow git:
+
+Commits:
+
+- Nommage:
+  - Le message doit être suffisemment clair pour comprendre ce que fait le commit. Le contenu permet de savoir comment il le fait. Si on a besoin de lire le code pour comprendre ce que fait le commit, c'est que le message doit être clarifié.
+
+  - Format: [CATEGORIE]: [VERBE IMPERATIF] [DESCRIPTION]. La categorie est optionelle, et peut être ommise si pas nécessaire.
+    Ex: "query.events: add dynamic ordering support"
+    Ex: "divide UserClubActivity.reviewScore by two"
+    Ex: "fix clubsByDistance bug"
+
+- Contenu:
+  - Un commit doit être atomique: un ajout fonctionnel (ou un bugfix), pas plus, pas moins.
+    Si un ajout est coupée en 2 commits qui marchent pas l'un sans l'autre, ces 2 commits doivent être fusionnés.
+    Si le commit contient des modifs qui ne sont pas vraiment liées, il doit être divisé en plusieurs commits.
+
+  - Chaque commit doit fonctionner, et doit être testé avant d'être push.
+
+
+Branches:
+- master représente la dernière version CLEAN et FONCTIONNELLE de l'app.
+  Par clean, j'entends que chacun des commits respecte les règles ci-dessus (commits bien découpé, et chacun des messages qui répond à la question "que fait ce commmit?" sans avoir à lire le code).
+  Chaque commit push sur master doit être clean, de manière à ne jamais avoir à modifier l'historique de master.
+  Chaque commit de chaque branche merge sur master doit être clean au moment du merge.
+
+- On doit éviter le plus possible de commit sur master sans passer par une branche.
+  Créer une branche pour un seul commit étant stupide, ça demande un peu de planification pour savoir quels commits on va regrouper sur une branche.
+
+- production représente la version actuellement déployée de l'app.
+  Elle peut ne pas être clean, c'est pourquoi on ne va JAMAIS que production vers master (que ce soit merge ou rebase).
+  Pour mettre à jour production, deux cas possibles:
+  - soit on commit directement dessus (commits temporaires dans ce cas, qui seront rework plus tard)
+  - soit on overwrite production avec master
+
+- Marche à suivre pour tous les commits temporaires (hotfixes / choses à tester en prod par exemple):
+  - Push direct sur la branche production dans un premier temps.
+  - Déploiement / test / nouveaux commits (sur production) si nécessaire.
+  - Une fois la feature fonctionnelle, on merge / clean les commits, et / ou on les regroupe sur une nouvelle branche.
+  - Seulement maintenant que les commits sont clean, on peut les push / merge la nouvelle branche sur master.
+
+- Marche à suivre pour merge une branche sur master:
+  - On clean l'historique de la branche (on renomme / merge / split les commits comme il faut pour qu'ils soient clean)
+  - On rebase la branche sur master (git rebase master feature)
+  - On merge la branche avec master, en créant un merge commit (git checkout master; git merge --no-ff feature)
+
+
+Tips:
+
+- Une branche est comme un pointeur vers un commit: supprimer la branche, ou modifier ce sur quoi elle pointe n'a aucun effet sur les commits.
+- Chaque branche a une version locale et une version remote: master est la branche locale, origin/master est la branche remote
+
+
+Commandes:
+- git fetch: récupère la dernière version de chaque branche remote (origin/*), sans toucher aux branches locales.
+    Quand on `git pull` master, ça équivaut à faire `git fetch && git rebase origin/master`
+
+- git rebase -i COMMIT_REF: lance un rebase interactif, qui permet de faire ce qu'on veut avec tous les commits (renommer/éditer/merge...)
+    COMMIT_REF peut être une branche, un commit hash, ou même un référence vers un commit précédent: HEAD~N représente le Nème dernier commit.
+    git rebase -i HEAD~5 va permettre de modifier les 5 derniers commits comme on veut.
+    Attention: faire un rebase modifie l'historique de la branche, ce qui pourra provoquer des conflits avec la branche remote correspondante.
+
+- git branch -f BRANCH: overwrite la branche BRANCH avec la branche actuelle. Attention, ça modifiera l'historique de la branche BRANCH.
+
+- git cherry-pick COMMIT_REF: copie ce commit sur la branche actuelle. Attention, le commit créé sera différent de l'ancien, même si les deux apportent exactement les mêmes modifications.
+
+
+
+Liens utiles:
+- https://www.atlassian.com/git/tutorials/merging-vs-rebasing
+- https://www.atlassian.com/git/tutorials/resetting-checking-out-and-reverting
+- https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History

@@ -1,0 +1,20 @@
+Colloborating articles:
+- Branching structure / naming branches
+- When to edit history (with diff between when to rebase only (no altering commits), and when to alter commits)
+- When NOT TO edit history
+
+
+How-to:
+- Resolving merge conflicts [[ Resolving conflicts ]]
+
+- Rebasing a branch anywhere (careful not to pick the commits between the last common ancestor and the start of the branch)
+
+
+Basic git features:
+- Merging branches (explain when to use --no-ff) (4 cases: parent, child, related, unrelated)
+
+- What is a commit (hash, msg, contents, parent, immutable)
+- What is a ref (branches, tags, remote-tracking branches, well known refs)
+- Refs arithmetics
+- Visualizing repository, branches, commits
+- Resolving conflicts
